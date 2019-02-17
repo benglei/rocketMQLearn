@@ -1,0 +1,13 @@
+该例子只是伪代码，说明rocketmq的事务情况的，没有运行过，且是写好了producer和comsumer以及本地事务处理逻辑TransactionExecuterImpl
+一些说明：
+一、producer：
+1、未开源版本的rocketmq是支持事务的，它支持的事务原理和2pc原理有点像，就是二阶段提交：
+2、第一阶段先拿到消息的地址
+3、第二阶段:本地事务业务逻辑处理，处理成功返回LocalTransactionState.COMMIT_MESSAGE;若果不成功则返回return LocalTransactionState.ROLLBACK_MESSAGE;
+4、就能保证本地事务和发送到mq的消息是一致的
+
+二、consumer:
+1、本例中是用的DefaultMQPushConsumer，可以设置监听类Listener，该类consumeMessage中取消费消息
+2、若果没有抛异常，说明消费成功，会返回ConsumeConcurrentlyStatus.CONSUME_SUCCESS;//消费成功
+3、如果跑出了异常，则进行处理：ConsumeConcurrentlyStatus.RECONSUME_LATER给rocketmq，以便rocketmq会稍后重新发送消息，最后限定次数为三次，
+这是因为三次都没有处理成功，说明程序处理不了了，应该将消息记录到数据库，以便人工或者其他方式处理
