@@ -24,7 +24,7 @@ public class PayTest {
             //主题
             message.setTopic("pay");
             //字标签
-            message.setTopic("tag");
+            message.setTags("tag");
             //key
             String uuid = UUID.randomUUID().toString();
             System.out.println("key:"+uuid);
